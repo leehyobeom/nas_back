@@ -21,5 +21,4 @@ export class User extends Model {
 
   @Column
   company_name: string;
-
 }

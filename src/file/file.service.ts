@@ -15,12 +15,12 @@ export class FileService {
     private readonly config: ConfigService
   ) {}
 
-  async getFileList() {
+  async getFileList(path: string) {
     let params = {
         Bucket: this.config.get('AWS_BUCKET_NAME'),
+        Prefix: path
       };
     const data = await this.s3.listObjects(params).promise();
-    console.log(data);
     return data.Contents;
   }
 
@@ -33,7 +33,8 @@ export class FileService {
     return "";
   }
 
-  async moveFolder(email:string, oldPath: string, newPath: string) {
+  async moveFile(email:string, oldPath: string, newPath: string) {
+    console.log("moveFolder");
     const bucketName = this.config.get('AWS_BUCKET_NAME');
     const folderToMove = email + oldPath;
     const destinationFolder = email + newPath;
@@ -60,17 +61,17 @@ export class FileService {
                 Key: fileInfo.Key,
                 }).promise();
             })
-            );
+          );
     } catch (err) {
-    console.error(err); // error handling
+    console.error(err);
     }
   }
 
-  async deleteFolder(email:string, path: string) {
+  async deleteFile(email:string, path: string) {
     const bucket = this.config.get('AWS_BUCKET_NAME');
     const listParams = {
         Bucket: bucket,
-        Key: email + path,
+        Prefix: email + path,
     };
 
     const listedObjects = await this.s3.listObjectsV2(listParams).promise();
@@ -88,6 +89,6 @@ export class FileService {
 
     await this.s3.deleteObjects(deleteParams).promise();
 
-    if (listedObjects.IsTruncated) await this.deleteFolder(bucket, email + path);
+    if (listedObjects.IsTruncated) await this.deleteFile(bucket, email + path);
     }
 }
