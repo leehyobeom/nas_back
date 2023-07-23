@@ -5,8 +5,13 @@ import { User } from './user.entity';
 export class UserService {
   constructor(
     @Inject('User_REPOSITORY')
-    private userRepository: typeof User
+    private userRepository: typeof User,
   ) {}
+
+  async create(user: any): Promise<User | undefined> {
+    const result = await this.userRepository.create(user);
+    return result?.dataValues;
+  }
 
   async findOne(email: string): Promise<User | undefined> {
     const result = await this.userRepository.findOne<User>({

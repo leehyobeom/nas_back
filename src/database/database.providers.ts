@@ -1,16 +1,18 @@
 import { Sequelize } from 'sequelize-typescript';
 import { User } from '../user/user.entity';
+import { ConfigService} from '@nestjs/config';
 
 export const databaseProviders = [
   {
     provide: 'SEQUELIZE',
-    useFactory: async () => {
+    inject: [ConfigService],
+    useFactory: async (config: ConfigService) => {
       const sequelize = new Sequelize({
         dialect: 'mysql',
-        host: 'localhost',
-        port: 3306,
-        username: 'root',
-        password: '12345',
+        host: config.get<string>('DATABASE_HOST'),
+        port: config.get<number>('DATABASE_PORT'),
+        username: config.get<string>('DATABASE_USER'),
+        password: config.get<string>('DATABASE_PASSWORD'),
         database: 'nas',
       });
       sequelize.addModels([User]);
